@@ -1,7 +1,3 @@
-
-
-restart:
-
 printf("\n=============================================================\n");
 printf("= Software demo for the linear 2nd order example with input =\n");
 printf("=============================================================\n\n");
@@ -270,5 +266,3 @@ eq := Equations(RosenfeldGroebner(syst_new, R2))[1]:
 printf("\n======================================================================\n");
 printf("Checking if the new IO-equations are the same as the old IO-equations:\n\n"):
 for i from 1 to numelems(outputs) do printf("%a\n", evalb(simplify(eq[-i] - IOeqs[numelems(outputs)-i+1])= 0)): od;
-
-
