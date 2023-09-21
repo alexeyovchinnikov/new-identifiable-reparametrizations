@@ -133,8 +133,7 @@ LieDerIndet := [seq([seq(add(
                      i = 1..numelems(outputs)
                     )
                  ]:
-# We now substitute for the coefficients of the outputs (we do not want to change the outputs)
-#LieDerIndet := subs([f[1,1,1] = 1, f[2,1,1] = 1], LieDerIndet):
+# We now substitute for the coefficients of the outputs 
 LieDerIndet := subs(alg_subs, LieDerIndet):
 
 printf("\n==============================\n");
