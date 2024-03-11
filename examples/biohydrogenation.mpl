@@ -1,6 +1,9 @@
 
 restart:
-#The coefff and DecomposePolynomial are taken from # https://github.com/pogudingleb/AllIdentifiableFunctions
+
+
+#The coefff and DecomposePolynomial are taken from 
+# https://github.com/pogudingleb/AllIdentifiableFunctions
 coefff:=proc(P, t)
     local L, H, i, k:
     L:=[coeffs(P, indets(P), 'h_aux_for_coef')]: H:=[h_aux_for_coef]: k:=0:
@@ -9,13 +12,16 @@ coefff:=proc(P, t)
     end do:
     return k;
 end proc:
-DecomposePolynomial := proc(p, vars_main, vars_coef, infolevel)
+
+
+DecomposePolynomial := proc(p, vars_main, vars_coef, infolevel)
     # Input: p - polynomial in two groups of variables: vars_main and vars_coef
     # Computes a decomposition of minimal length of p as a linear combination 
     # of products A * B, where A is a polynomial in vars_main and B 
     # is a polynomial in vars_coef return two lists: list of A's and list of B's
     local cf, monoms, result_cf, result_monom, i, c, m, j, lc, lm, coeff_in_c:
-    cf := [coeffs(collect(p, vars_main, 'distributed'), vars_main, 'monoms')]:    monoms := [monoms]:
+    cf := [coeffs(collect(p, vars_main, 'distributed'), vars_main, 'monoms')]:
+    monoms := [monoms]:
     result_cf := []:
     result_monom := Array([]):
     if infolevel > 0 then
@@ -164,19 +170,30 @@ LieDer := [seq([op(NormalForm(outputs_maxorders[j][2], eq2)),
 
 # Substitute new indeterminates into the state variables in the Lie derivatives
 LieDerSubs := subs({seq(states[i](t) = w[i], i = 1 .. numelems(states))}, LieDer):
-# Replace the coefficients with new variables 
-for i from 1 to numelems(outputs) do  for j from 1 to degree(outputs_maxorders[i][1])+1 do      p[i,j] := DecomposePolynomial(expand(numer(LieDerSubs[i][j])),                                     [seq(w[s], s = 1 .. numelems(states)), input_derivatives],                                    params, 
+
+
+# Replace the coefficients with new variables 
+
+for i from 1 to numelems(outputs) do
+  for j from 1 to degree(outputs_maxorders[i][1])+1 do
+      p[i,j] := DecomposePolynomial(expand(numer(LieDerSubs[i][j])), 
+                                    [seq(w[s], s = 1 .. numelems(states)), input_derivatives],
+                                    params, 
                                     0                
-               )[2]:   od:         
-od:for i from 1 to numelems(outputs) do
+               )[2]:
+   od:         
+od:
+for i from 1 to numelems(outputs) do
   for j from 1 to degree(outputs_maxorders[i][1])+1 do
       pden[i,j] := DecomposePolynomial(expand(denom(LieDerSubs[i][j])), 
                                     [seq(w[s], s = 1 .. numelems(states)), input_derivatives],
                                     params, 
                                     0                
-               )[2]:   od:         
+               )[2]:
+   od:         
 od:
-LieDerIndet := [seq([seq((add(
+
+LieDerIndet := [seq([seq((add(
                              p[i,j][s] * f[i,j,s], 
                              s = 1 .. numelems(p[i,j])
                             ))/(add(
@@ -191,7 +208,8 @@ od:
                  ]:
 
 # We now substitute for the coefficients of the outputs (we make additional substitutions to reduce the amount of computation)
-LieDerIndet := subs([f[1,1,1] = 1, f[2,1,1] = 1, fd[1,1,1] = 1, fd[2,1,1] = 1, f[2, 2, 1] = -k5, fd[2, 2, 2] = 1, fd[2, 2, 1]=k6, fd[1, 2, 1] = 1, fd[1, 2, 2] = 0, fd[1, 2, 3] = k6, f[1, 2, 1] = k5 - k7, f[1, 2, 2] = k7, f[1,2,4] = -k6 * k7], LieDerIndet):LieDerIndet := subs(alg_subs, LieDerIndet):
+LieDerIndet := subs([f[1,1,1] = 1, f[2,1,1] = 1, fd[1,1,1] = 1, fd[2,1,1] = 1, f[2, 2, 1] = -k5, fd[2, 2, 2] = 1, fd[2, 2, 1]=k6, fd[1, 2, 1] = 1, fd[1, 2, 2] = 0, fd[1, 2, 3] = k6, f[1, 2, 1] = k5 - k7, f[1, 2, 2] = k7, f[1,2,4] = -k6 * k7], LieDerIndet):
+LieDerIndet := subs(alg_subs, LieDerIndet):
 printf("\n==============================\n");
 for i from 1 to numelems(outputs) do
   printf("\The Lie derivatives for %a are:\n\n", outputs_maxorders[i][2]);
@@ -293,7 +311,8 @@ conv := simplify(subs(additional_subs1, Flatten(h)) -
                                       subs(
                                           {seq(states[i](t) = states[i], i = 1 .. numelems(states))                                            }, 
                                            subs(alg_subs,Flatten(LieDer)) )):
-B := Groebner[Basis](numer(conv), plex(op(xvars), op(states))):
+
+B := Groebner[Basis](numer(conv), plex(op(xvars), op(states))):
 ChangeVars := subs(alg_subs_rev, solve(B, xvars)[1]):
 printf("\n=========================================\n");
 printf("The corresponding change of variables is:\n\n");
@@ -318,10 +337,14 @@ R2 := DifferentialRing(
                       arbitrary = params
                      ):
 eq := Equations(RosenfeldGroebner(syst_new, R2))[1]:
-printf("\n======================================================================\n");
+
+printf("\n======================================================================\n");
 printf("Checking if the new IO-equations are the same as the old IO-equations:\n\n"):
 for i from 1 to numelems(outputs) do printf("%a\n", evalb(simplify(eq[-i] - IOeqs[numelems(outputs)-i+1])= 0)): od;
-# The following code to simplify the generators of identifiable functions is taken from# https://github.com/pogudingleb/AllIdentifiableFunctions with(PolynomialIdeals):
+# The following code to simplify the generators of identifiable functions is taken from
+# https://github.com/pogudingleb/AllIdentifiableFunctions 
+
+with(PolynomialIdeals):
 
 #------------------------------------------------------------------------------
 
@@ -386,8 +409,24 @@ FilterGenerators := proc(ideal)
 end proc:
 
 
-# Compute a set of generators of the IO-identifiable functions (with simplification)coefs := coeffs(expand(IOeqs[1]),[diff(y2(t), t, t), diff(y2(t), t), y1(t), y2(t)]):cfs := coeffs(expand(IOeqs[1]/coefs[1]),[diff(y2(t), t, t), diff(y2(t), t), y1(t), y2(t)]):printf("================================================\n"):printf("= Generators of IO-identifiable functions are: =\n\n"):IOIdentifiableFunctions := map(simplify,FilterGenerators(FieldToIdeal([cfs]))):for g in IOIdentifiableFunctions do printf("%a\n", g): od:
-printf("\n= We immediately see that the coefficients of new ODE #1 and #2 =\n"):printf("= are IO-identifiable                                           =\n"):# The coefficient list of new ODE #3:cflist := simplify([coeffs(expand(simplify((w[2]+w[3])*subs(fd[1,2,2] = 0, ((w[2]+w[3]+fd[1,2,2])*(k8-w[3]-fd[1,2,2])*(k8+k10-w[3]-fd[1,2,2])*k9+k10*k7*w[2])/k10/(w[2]+w[3]+fd[1,2,2])))),[w[1],w[2],w[3]])]):printf("\n= The coefficients of new ODE #3 are: =\n\n"):
+# Compute a set of generators of the IO-identifiable functions (with simplification)
+coefs := coeffs(expand(IOeqs[1]),[diff(y2(t), t, t), diff(y2(t), t), y1(t), y2(t)]):
+cfs := coeffs(expand(IOeqs[1]/coefs[1]),[diff(y2(t), t, t), diff(y2(t), t), y1(t), y2(t)]):
+printf("================================================\n"):
+printf("= Generators of IO-identifiable functions are: =\n\n"):
+IOIdentifiableFunctions := map(simplify,FilterGenerators(FieldToIdeal([cfs]))):
+for g in IOIdentifiableFunctions do printf("%a\n", g): od:
+
+printf("\n= We immediately see that the coefficients of new ODE #1 and #2 =\n"):
+printf("= are IO-identifiable                                           =\n"):
+
+# The coefficient list of new ODE #3:
+cflist := simplify([coeffs(expand(simplify((w[2]+w[3])*subs(fd[1,2,2] = 0, ((w[2]+w[3]+fd[1,2,2])*(k8-w[3]-fd[1,2,2])*(k8+k10-w[3]-fd[1,2,2])*k9+k10*k7*w[2])/k10/(w[2]+w[3]+fd[1,2,2])))),[w[1],w[2],w[3]])]):
+printf("\n= The coefficients of new ODE #3 are: =\n\n"):
 for g in cflist do printf("%a\n", g): od:
-# Checking if each coefficient of the third new ODE belongs to the field# of IO-identifiable functions:printf("\n= The coefficients of new ODE #3 are IO-identifiable = \n\n"):for cf in cflist do printf("%a\n", IdealContainment(FieldToIdeal([cf]), FieldToIdeal(IOIdentifiableFunctions))); od;
+
+# Checking if each coefficient of the third new ODE belongs to the field
+# of IO-identifiable functions:
+printf("\n= The coefficients of new ODE #3 are IO-identifiable = \n\n"):
+for cf in cflist do printf("%a\n", IdealContainment(FieldToIdeal([cf]), FieldToIdeal(IOIdentifiableFunctions))); od;
 
